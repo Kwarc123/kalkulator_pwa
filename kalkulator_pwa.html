@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Nadpłat</title>
+    
+    <!-- Link do Manifestu Aplikacji -->
+    <link rel="manifest" href="manifest.webmanifest">
+    
+    <!-- Kolor paska w przeglądarce na mobilkach -->
+    <meta name="theme-color" content="#003F63"/>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[typeD="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-900">
+
+    <div class="container mx-auto max-w-lg p-4 min-h-screen">
+        
+        <header class="text-center my-6">
+            <h1 class="text-3xl font-bold text-[#003F63]">Kalkulator Nadpłat</h1>
+            <p class="text-slate-600">Oblicz swoje oszczędności</p>
+        </header>
+
+        <!-- Karta Kalkulatora -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+            <h2 class="text-xl font-bold text-center mb-6 text-slate-800">Wprowadź Dane Kredytu</h2>
+            <div class="space-y-4">
+                <div>
+                    <label for="principal" class="block text-sm font-medium text-slate-700">Pozostały Kapitał (zł)</label>
+                    <input type="number" id="principal" value="460000" class="mt-1 block w-full p-3 bg-slate-100 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#003F63]">
+                </div>
+                
+                <div>
+                    <label for="years" class="block text-sm font-medium text-slate-700">Pozostałe Lata</label>
+                    <input type="number" id="years" value="25" class="mt-1 block w-full p-3 bg-slate-100 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#003F63]">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="margin" class="block text-sm font-medium text-slate-700">Marża (%)</label>
+                        <input type="number" id="margin" step="0.1" value="1.7" class="mt-1 block w-full p-3 bg-slate-100 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#003F63]">
+                    </div>
+                    <div>
+                        <label for="wibor" class="block text-sm font-medium text-slate-700">WIBOR (%)</label>
+                        <input type="number" id="wibor" step="0.01" value="4.30" class="mt-1 block w-full p-3 bg-slate-100 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#003F63]">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="overpayment" class="block text-sm font-bold text-slate-700">Miesięczna Nadpłata (zł)</label>
+                    <input type="number" id="overpayment" step="50" value="300" class="mt-1 block w-full p-3 bg-slate-100 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#003F63] text-lg font-bold">
+                </div>
+                
+                <button id="calculateButton" class="w-full bg-[#003F63] text-white font-bold py-4 px-6 rounded-lg shadow-lg hover:bg-[#005a8f] transition-colors duration-300 text-lg">
+                    Oblicz Oszczędności
+                </button>
+            </div>
+        </div>
+
+        <!-- Karta Wyników -->
+        <div id="resultsCard" class="bg-white rounded-2xl shadow-xl p-6 mb-6 hidden">
+            <h2 class="text-xl font-bold text-center mb-6 text-slate-800">Twoje Oszczędności</h2>
+            
+            <div class="text-center mb-6 space-y-4">
+                <div>
+                    <p class="text-sm text-slate-600">Skrócisz Kredyt o:</p>
+                    <p id="timeSaved" class="text-3xl font-bold text-[#003F63]">0 lat, 0 mies.</p>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-600">Oszczędzisz na Odsetkach:</p>
+                    <p id="interestSaved" class="text-3xl font-bold text-[#003F63]">0 zł</p>
+                </div>
+            </div>
+
+            <hr class="my-6">
+
+            <h3 class="text-lg font-semibold text-center mb-4">Podsumowanie</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="py-2">Parametr</th>
+                            <th class="py-2 text-right">Bez Nadpłat</th>
+                            <th class="py-2 text-right font-bold">Z Nadpłatą</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b">
+                            <td class="py-2">Okres Kredytu</td>
+                            <td id="baseTerm" class="py-2 text-right">0 lat, 0 mies.</td>
+                            <td id="newTerm" class="py-2 text-right font-bold">0 lat, 0 mies.</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-2">Łączne Odsetki</td>
+                            <td id="baseInterest" class="py-2 text-right">0 zł</td>
+                            <td id="newInterest" class="py-2 text-right font-bold">0 zł</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2">Całkowita Spłata</td>
+                            <td id="baseTotal" class="py-2 text-right">0 zł</td>
+                            <td id="newTotal" class="py-2 text-right font-bold">0 zł</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <footer class="text-center my-6 text-slate-500 text-xs">
+            <p>Wszystkie obliczenia są szacunkowe i mają charakter informacyjny.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Definicje elementów DOM
+            const principalInput = document.getElementById('principal');
+            const yearsInput = document.getElementById('years');
+            const marginInput = document.getElementById('margin');
+            const wiborInput = document.getElementById('wibor');
+            const overpaymentInput = document.getElementById('overpayment');
+            const calculateButton = document.getElementById('calculateButton');
+            const resultsCard = document.getElementById('resultsCard');
+
+            // Elementy wyników
+            const timeSavedEl = document.getElementById('timeSaved');
+            const interestSavedEl = document.getElementById('interestSaved');
+            const baseTermEl = document.getElementById('baseTerm');
+            const newTermEl = document.getElementById('newTerm');
+            const baseInterestEl = document.getElementById('baseInterest');
+            const newInterestEl = document.getElementById('newInterest');
+            const baseTotalEl = document.getElementById('baseTotal');
+            const newTotalEl = document.getElementById('newTotal');
+
+            // Formater waluty
+            const currencyFormatter = new Intl.NumberFormat('pl-PL', {
+                style: 'currency',
+                currency: 'PLN',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            });
+
+            // Funkcja obliczająca ratę miesięczną (annuitetową)
+            function calculateMonthlyPayment(principal, annualRate, years) {
+                const monthlyRate = annualRate / 12 / 100;
+                const numberOfPayments = years * 12;
+                if (monthlyRate === 0) {
+                    return principal / numberOfPayments;
+                }
+                const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+                return payment;
+            }
+
+            // Funkcja symulująca amortyzację
+            function calculateAmortization(principal, annualRate, years, monthlyOverpayment = 0) {
+                const monthlyRate = annualRate / 12 / 100;
+                const basePayment = calculateMonthlyPayment(principal, annualRate, years);
+                const totalMonthlyPayment = basePayment + monthlyOverpayment;
+
+                let currentPrincipal = principal;
+                let months = 0;
+                let totalInterestPaid = 0;
+
+                const baseTotalInterest = (basePayment * years * 12) - principal;
+
+                // Obsługa scenariusza bez nadpłat
+                if (monthlyOverpayment === 0) {
+                    return {
+                        termInMonths: years * 12,
+                        totalInterest: baseTotalInterest,
+                        totalPaid: principal + baseTotalInterest
+                    };
+                }
+
+                // Pętla symulacji spłaty z nadpłatą
+                while (currentPrincipal > 0) {
+                    months++;
+                    const monthlyInterest = currentPrincipal * monthlyRate;
+                    let principalPaid = totalMonthlyPayment - monthlyInterest;
+                    
+                    if (currentPrincipal - principalPaid < 0) {
+                        principalPaid = currentPrincipal; // Ostatnia płatność
+                    }
+                    
+                    totalInterestPaid += monthlyInterest;
+                    currentPrincipal -= principalPaid;
+                    
+                    if (months > years * 12 * 2) break; // Bezpiecznik pętli
+                }
+
+                return {
+                    termInMonths: months,
+                    totalInterest: totalInterestPaid,
+                    totalPaid: principal + totalInterestPaid
+                };
+            }
+
+            // Funkcja formatująca miesiące na lata i miesiące
+            function formatMonths(totalMonths) {
+                const years = Math.floor(totalMonths / 12);
+                const months = totalMonths % 12;
+                return `${years} lat, ${months} mies.`;
+            }
+
+            // Główna funkcja obliczeniowa
+            function runCalculation() {
+                // Pobranie wartości
+                const principal = parseFloat(principalInput.value) || 0;
+                const years = parseFloat(yearsInput.value) || 0;
+                const margin = parseFloat(marginInput.value) || 0;
+                const wibor = parseFloat(wiborInput.value) || 0;
+                const overpayment = parseFloat(overpaymentInput.value) || 0;
+                
+                const annualRate = margin + wibor;
+                
+                // Obliczenia
+                const baseResult = calculateAmortization(principal, annualRate, years, 0);
+                const newResult = calculateAmortization(principal, annualRate, years, overpayment);
+                
+                const interestSaved = baseResult.totalInterest - newResult.totalInterest;
+                const monthsSaved = baseResult.termInMonths - newResult.termInMonths;
+
+                // Wyświetlanie wyników
+                timeSavedEl.innerText = formatMonths(monthsSaved);
+                interestSavedEl.innerText = currencyFormatter.format(interestSaved);
+                
+                baseTermEl.innerText = formatMonths(baseResult.termInMonths);
+                newTermEl.innerText = formatMonths(newResult.termInMonths);
+                
+                baseInterestEl.innerText = currencyFormatter.format(baseResult.totalInterest);
+                newInterestEl.innerText = currencyFormatter.format(newResult.totalInterest);
+                
+                baseTotalEl.innerText = currencyFormatter.format(baseResult.totalPaid);
+                newTotalEl.innerText = currencyFormatter.format(newResult.totalPaid);
+                
+                // Pokaż kartę wyników
+                resultsCard.classList.remove('hidden');
+            }
+
+            // Przypisanie event listenera
+            calculateButton.addEventListener('click', runCalculation);
+            
+            // Uruchom obliczenia przy starcie z domyślnymi wartościami
+            runCalculation();
+
+        });
+
+        // Skrypt rejestrujący Service Worker (dla PWA)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('Service Worker zarejestrowany pomyślnie:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Rejestracja Service Workera nie powiodła się:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
