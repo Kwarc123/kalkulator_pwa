@@ -1,0 +1,24 @@
+{
+    "name": "Kalkulator Nadpłat Kredytu",
+    "short_name": "Kalkulator",
+    "description": "Kalkulator do symulacji nadpłat kredytu hipotecznego.",
+    "start_url": "./kalkulator_pwa.html",
+    "display": "standalone",
+    "background_color": "#f1f5f9",
+    "theme_color": "#003F63",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "https://placehold.co/192x192/003F63/FFFFFF?text=KN",
+            "type": "image/png",
+            "sizes": "192x192",
+            "purpose": "any"
+        },
+        {
+            "src": "https://placehold.co/512x512/003F63/FFFFFF?text=KN",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "maskable"
+        }
+    ]
+}
